@@ -29,7 +29,7 @@ jwt:
   secret: ${JWT_SECRET}
 
 app:
-  appUrl: http://3.108.194.133.nip.io/api/
+  appUrl: http://3.108.194.133.nip.io
 logging:
   level:
     org.springframework.security: TRACE
