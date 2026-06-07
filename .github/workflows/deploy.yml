@@ -17,7 +17,7 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
 
       - name: Build Project
@@ -26,11 +26,8 @@ jobs:
       - name: Stage files for SCP
         run: |
           mkdir -p deploy-stage
-          
-          # Find the executable "fat" JAR (ignoring the plain JAR) and rename it to app.jar
           find build/libs -maxdepth 1 -name "*.jar" ! -name "*-plain.jar" -exec cp {} deploy-stage/app.jar \;
-          
-          # Copy New Relic agent files (using || true so it doesn't fail if they are missing locally)
+          cp deploy.sh deploy-stage/
           cp newrelic.jar deploy-stage/ || true
           cp newrelic.yml deploy-stage/ || true
 
@@ -44,32 +41,13 @@ jobs:
           target: "~/"
           strip_components: 1
 
-      - name: Execute Deployment Scripts on EC2
+      - name: Execute Deployment on EC2
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
-          # Explicitly set a slightly longer timeout just in case the server is slow to respond
-          command_timeout: 10m
           script: |
-            # 1. Create the .env file from GitHub Secrets
             echo "${{ secrets.ENV_FILE_CONTENT }}" > ~/.env
-            
-            # 2. Stop any running instance of THIS specific application
-            pkill -f 'app.jar' || true
-            
-            # 3. Load environment variables
-            set -a
-            source ~/.env
-            set +a
-
-            set +m
-            # 4. Start the new app in the background and detach it completely
-            # Assuming newrelic.jar was successfully copied over
-            nohup java -javaagent:newrelic.jar -jar app.jar > app.log 2>&1 < /dev/null &
-            disown $!
-            
-            # Give it a moment to detach and exit the SSH session cleanly
-            sleep 2
-            exit 0
+            chmod +x ~/deploy.sh
+            echo "~/deploy.sh" | at now
