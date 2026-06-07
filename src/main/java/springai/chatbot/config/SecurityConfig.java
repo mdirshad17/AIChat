@@ -30,7 +30,7 @@ public class SecurityConfig {
 
                 // 1. Force Stateless Sessions
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
 
                 // 2. Protect Endpoints
