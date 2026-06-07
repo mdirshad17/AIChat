@@ -68,6 +68,7 @@ jobs:
             # 4. Start the new app in the background and detach it completely
             # Assuming newrelic.jar was successfully copied over
             nohup java -javaagent:newrelic.jar -jar app.jar > app.log 2>&1 < /dev/null &
+            disown $!
             
             # Give it a moment to detach and exit the SSH session cleanly
             sleep 2
