@@ -48,6 +48,6 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            echo "${{ secrets.ENV_FILE_CONTENT }}" > ~/.env
+            printf '%s' '${{ secrets.ENV_FILE_CONTENT }}' > ~/.env
             chmod +x ~/deploy.sh
             echo "~/deploy.sh" | at now
