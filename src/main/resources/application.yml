@@ -32,6 +32,7 @@ app:
   appUrl: https://project-9v8d6.vercel.app/
 logging:
   level:
-    org.springframework.security: DEBUG
+    org.springframework.security: TRACE
+    org.springframework.web: DEBUG
 server:
   port: 8080
